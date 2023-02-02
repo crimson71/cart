@@ -4,28 +4,80 @@
     <div class="thumb">
       <div class="custom-control custom-checkbox">
         <!-- 复选框 -->
-        <input type="checkbox" class="custom-control-input" id="cb1" :checked="true" />
-        <label class="custom-control-label" for="cb1">
+        <input type="checkbox" class="custom-control-input" :id="'cb' + id" :checked="state" @change="stateChange" />
+        <label class="custom-control-label" :for="'cb' + id">
           <!-- 商品的缩略图 -->
-          <img src="../../assets/logo.png" alt="" />
+          <img :src="pic" alt="" />
         </label>
       </div>
     </div>
     <!-- 右侧信息区域 -->
     <div class="goods-info">
       <!-- 商品标题 -->
-      <h6 class="goods-title">商品名称商品名称商品名称商品名称</h6>
+      <h6 class="goods-title">{{ title }}</h6>
       <div class="goods-info-bottom">
         <!-- 商品价格 -->
-        <span class="goods-price">￥0</span>
+        <span class="goods-price">￥{{ price }}</span>
         <!-- 商品的数量 -->
+        <Counter :num="count" :id="id"></Counter>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-export default {}
+import Counter from '@/components/Counter/Counter.vue'
+import { type } from 'os';
+
+export default {
+  // props属性的数据为只读，用v-bind
+  props: {
+    // 商品的 id
+    // 为啥在这里要封装一个 id 属性呢？
+    // 原因:将来,子组件中商品的勾选状态变化之后, 需要通过子 -> 父的形式,
+    // 通知父组件根据 id 修改对应商品的勾选状态。
+    id: {
+      required:true,
+      type:Number,
+    },
+    title:{ 
+      default:'',
+      type:String,
+
+    },
+    price: {
+      dafault:0,
+      type:Number,
+
+    },
+    pic: {
+      default:'',
+      type:String,
+     
+    },
+    state: {
+      default:true,
+      type:Boolean,
+    },
+    count: {
+      default:1,
+      type:Number,
+    }
+  },
+  methods: {
+    // 只要复选框的选中状态发生了变化，就会调用这个处理函数
+    // 向父组件传递数据用自定义事件$emit('事件名'，要向父组件传递的数据)
+    stateChange(e) {
+      const newState = e.target.checked
+      this.$emit('state-change',{ id:this.id,value:newState})
+
+    }
+    
+  },
+  components: {
+    Counter
+  }
+}
 </script>
 
 <style lang="less" scoped>
